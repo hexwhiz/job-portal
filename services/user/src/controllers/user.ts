@@ -145,7 +145,13 @@ export const updateResume = TryCatch(async (req: AuthenticatedRequest, res) => {
 
 export const addSkillToUser = TryCatch(
   async (req: AuthenticatedRequest, res) => {
-    const userId = req.user?.user_id;
+    const user = req.user;
+
+    if (!user) {
+      throw new ErrorHandler(401, "Authentication required");
+    }
+
+    const userId = user.user_id;
     const { skillName } = req.body;
 
     if (!skillName || skillName.trim() === "") {
@@ -272,7 +278,7 @@ export const applyForJob = TryCatch(async (req: AuthenticatedRequest, res) => {
 
   try {
     [newApplication] =
-      await sql`INSERT INTO applications (job_id, applicant_id, applicant_email, resume, subscribed) VALUES (${job_id}, ${applicant_id}, ${user?.email}, ${resume}, ${isSubscribed})`;
+      await sql`INSERT INTO applications (job_id, applicant_id, applicant_email, resume, subscribed) VALUES (${job_id}, ${applicant_id}, ${user.email}, ${resume}, ${isSubscribed})`;
   } catch (error: any) {
     if (error.code === "23505") {
       throw new ErrorHandler(409, "you have already applied to this job.");
@@ -288,8 +294,14 @@ export const applyForJob = TryCatch(async (req: AuthenticatedRequest, res) => {
 
 export const getAllaplications = TryCatch(
   async (req: AuthenticatedRequest, res) => {
+    const user = req.user;
+
+    if (!user) {
+      throw new ErrorHandler(401, "Authentication required");
+    }
+
     const applications = await sql`
-    SELECT a.*, j.title AS job_title, j.salary AS job_salary, j.location AS job_location FROM applications a JOIN jobs j ON a.job_id = j.job_id WHERE a.applicant_id = ${req.user?.user_id}
+    SELECT a.*, j.title AS job_title, j.salary AS job_salary, j.location AS job_location FROM applications a JOIN jobs j ON a.job_id = j.job_id WHERE a.applicant_id = ${user.user_id}
   `;
 
     res.json(applications);

@@ -56,7 +56,7 @@ export const createCompany = TryCatch(
     );
 
     const [newCompany] =
-      await sql`INSERT INTO companies (name, description, website, logo, logo_public_id, recruiter_id) VALUES (${name}, ${description}, ${website}, ${data.url}, ${data.public_id}, ${req.user?.user_id}) RETURNING *`;
+      await sql`INSERT INTO companies (name, description, website, logo, logo_public_id, recruiter_id) VALUES (${name}, ${description}, ${website}, ${data.url}, ${data.public_id}, ${user.user_id}) RETURNING *`;
 
     res.json({
       message: "Company created successfully",
@@ -69,10 +69,14 @@ export const deleteCompany = TryCatch(
   async (req: AuthenticatedRequest, res) => {
     const user = req.user;
 
+    if (!user) {
+      throw new ErrorHandler(401, "Authentication required");
+    }
+
     const { companyId } = req.params;
 
     const [company] =
-      await sql`SELECT logo_public_id FROM companies WHERE company_id = ${companyId} AND recruiter_id = ${user?.user_id}`;
+      await sql`SELECT logo_public_id FROM companies WHERE company_id = ${companyId} AND recruiter_id = ${user.user_id}`;
 
     if (!company) {
       throw new ErrorHandler(
@@ -193,8 +197,14 @@ export const updateJob = TryCatch(async (req: AuthenticatedRequest, res) => {
 
 export const getAllCompany = TryCatch(
   async (req: AuthenticatedRequest, res) => {
+    const user = req.user;
+
+    if (!user) {
+      throw new ErrorHandler(401, "Authentication required");
+    }
+
     const companies =
-      await sql`SELECT * FROM companies WHERE recruiter_id = ${req.user?.user_id}`;
+      await sql`SELECT * FROM companies WHERE recruiter_id = ${user.user_id}`;
 
     res.json(companies);
   }
@@ -250,7 +260,7 @@ export const getAllActiveJobs = TryCatch(async (req, res) => {
 
   querySting += " ORDER BY j.created_at DESC";
 
-  const jobs = (await sql.query(querySting, values)) as any[];
+  const jobs = (await sql.unsafe(querySting, values)) as any[];
 
   res.json(jobs);
 });
