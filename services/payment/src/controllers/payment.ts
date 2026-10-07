@@ -57,6 +57,10 @@ export const paymentVerification = TryCatch(
 
     const isAuthentic = expectedSignature === razorpay_signature;
 
+    if (!user) {
+      throw new ErrorHandler(401, "No valid User");
+    }
+
     if (isAuthentic) {
       const now = new Date();
 
@@ -65,7 +69,7 @@ export const paymentVerification = TryCatch(
       const expiryDate = new Date(now.getTime() + thirtyDays);
 
       const [updatedUser] =
-        await sql`UPDATE users SET subscription = ${expiryDate} WHERE user_id = ${user?.user_id} RETURNING *`;
+        await sql`UPDATE users SET subscription = ${expiryDate} WHERE user_id = ${user.user_id} RETURNING *`;
 
       res.json({
         message: "Subscription Purchased Successfully",
