@@ -6,11 +6,15 @@ import toast, { Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-export const utils_service = "http://35.154.186.96:5001";
-export const auth_service = "http://35.154.186.96:5000";
-export const user_service = "http://35.154.186.96:5002";
-export const job_service = "http://35.154.186.96:5003";
-export const payment_service = "http://35.154.186.96:5004";
+const apiBaseUrl = (
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
+).replace(/\/$/, "");
+
+export const utils_service = apiBaseUrl;
+export const auth_service = apiBaseUrl;
+export const user_service = apiBaseUrl;
+export const job_service = apiBaseUrl;
+export const payment_service = apiBaseUrl;
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
