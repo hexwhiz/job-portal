@@ -1,6 +1,4 @@
-import { neon } from "@neondatabase/serverless";
-import dotenv from "dotenv";
+import postgres from "postgres";
 
-dotenv.config();
-
-export const sql = neon(process.env.DB_URL as string);
+const sql = postgres(process.env.DB_URL as string);
+export { sql };

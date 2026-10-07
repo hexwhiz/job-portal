@@ -164,7 +164,7 @@ export const forgotPassword = TryCatch(async (req, res, next) => {
 });
 
 export const resetPassword = TryCatch(async (req, res, next) => {
-  const { token } = req.params;
+  const { token } = req.params as { token: string };
   const { password } = req.body;
 
   let decoded: any;

@@ -1,6 +1,4 @@
 import { Kafka, Producer, Admin } from "kafkajs";
-import dotenv from "dotenv";
-dotenv.config();
 
 let producer: Producer;
 let admin: Admin;
