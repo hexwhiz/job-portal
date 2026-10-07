@@ -1,0 +1,6 @@
+# Local environment files
+.env
+infra/env/*.env
+
+# Keep env templates versioned
+!infra/env/*.env.example
